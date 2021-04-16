@@ -9,6 +9,7 @@ python = "^3.9"
 requests = "^2.25.1"
 geojson = "^2.5.0"
 osm2geojson = "^0.1.29"
+Shapely = "^1.7.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

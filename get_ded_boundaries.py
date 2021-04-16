@@ -5,10 +5,11 @@ import logging
 
 import geojson
 import requests
-from osm2geojson import json2geojson
+
+from shared import get_osm_geojson, elevate_tags_to_properties
+
 
 GRAPHQL_ENDPOINT = "https://api-ext.ireland-census-preview.cantabular.com/graphql"
-OVERPASS_ENDPOINT = "https://overpass-api.de/api/interpreter"
 
 COUNTY_CATEGORIES_QUERY = """
 query VariableCategories {
@@ -31,8 +32,6 @@ query VariableCategories {
 }
 """
 
-
-# Configure logging
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)
 handler = logging.StreamHandler(sys.stdout)
@@ -82,38 +81,6 @@ def create_overpass_query(county):
   return query
 
 
-def get_ded_geojson(query):
-  response = requests.post(OVERPASS_ENDPOINT, 
-    data={"data": query},
-    headers={'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'})
-  
-  # If we receive 429 Too Many Requests or 504 Gateway Timeout
-  # then back off and return False to trigger a retry
-  # Response codes documented at: http://overpass-api.de/command_line.html
-  if response.status_code == 429:
-    LOGGER.info("Received too many requests response from Overpass")
-    LOGGER.info("Waiting for 10 minutes")
-    time.sleep(600)
-    return False
-  elif response.status_code == 504:
-    LOGGER.info("Received gateway timeout response from Overpass")
-    LOGGER.info("Waiting for 10 minutes")
-    time.sleep(600)
-    return False
-  else:
-    response.raise_for_status()
-  
-  json = response.json()
-  
-  try:
-    geojson = json2geojson(json)
-  except Exception:
-    LOGGER.warning("Failed to convert OSM JSON to GeoJSON for query '%s'", query)
-    geojson = None
-
-  return geojson
-
-
 def process_features(geo, county):
   if len(geo["features"]) == 0:
     LOGGER.warning("No features found in OSM data for %s", county)
@@ -122,13 +89,10 @@ def process_features(geo, county):
     # Add the name of the county so we can cross-reference
     # against the names from the census data 
     feature["properties"]["county"] = county
+    
+    # Move OSM tags up into feature properties
+    feature = elevate_tags_to_properties(feature)
 
-    # Move all the properties in the sub-field "tags"
-    # into the higher level properties field so it's
-    # easier to work with.
-    for tag in feature["properties"]["tags"].keys():
-      feature["properties"][tag] = feature["properties"]["tags"][tag]
-    del feature["properties"]["tags"]
   return geo["features"]
 
 
@@ -150,7 +114,7 @@ def main():
     while result == False and i < 5:
       i += 1
       LOGGER.info("Querying Overpass for %s DEDs", county)
-      result = get_ded_geojson(query)
+      result = get_osm_geojson(query)
     
     if result:
       LOGGER.info("Processing DED data for %s", county)
@@ -163,11 +127,11 @@ def main():
     # the number of times we have to back-off for a longer
     # period
     LOGGER.info("Pausing for 20 seconds")
-    time.sleep(10)
+    time.sleep(20)
   
   LOGGER.info("Writing output file")
-  with open("./output.geojson", mode="w") as f:
-      geojson.dump(output, f)
+  with open("./out/deds.geojson", mode="w") as f:
+    geojson.dump(output, f)
 
   # TODO: consider using https://github.com/mattijn/topojson to simplify and compress
 
