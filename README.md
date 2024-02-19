@@ -11,6 +11,6 @@ DED geometries taken from OSM are converted to GeoJSON and then the name of the 
 county is added in a `county` field within each GeoJSON feature's `properties` field. So
 the data can be matched up with census data held in Cantabular.
 
-## Requirements
+## Install requirements
 
-Listed in `pyproject.toml`.
+- Run `make` to create a virtual environment and install the required packages.

@@ -1,19 +1,16 @@
-[tool.poetry]
+[project]
 name = "ireland-osm-boundaries"
 version = "0.1.0"
 description = "Fetch electoral division boundaries from OpenStreetMap for each 1911 Irish county"
-authors = ["MikeT <mikejamesthompson@gmail.com>"]
-
-[tool.poetry.dependencies]
-python = "^3.9"
-requests = "^2.25.1"
-geojson = "^2.5.0"
-osm2geojson = "^0.1.29"
-Shapely = "^1.7.1"
-
-[tool.poetry.dev-dependencies]
-pytest = "^5.2"
+dependencies = [
+  "geojson==3.1.0",
+  "osm2geojson==0.2.4",
+  "requests==2.31.0",
+  "Shapely==2.0.3",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools", "wheel"]
+
+[tool.setuptools]
+packages = ["scripts"]

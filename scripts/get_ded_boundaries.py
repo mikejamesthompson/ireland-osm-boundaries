@@ -6,7 +6,7 @@ import logging
 import geojson
 import requests
 
-from shared import get_osm_geojson, elevate_tags_to_properties
+from scripts.shared import get_osm_geojson, elevate_tags_to_properties
 
 
 GRAPHQL_ENDPOINT = "https://api-ext.ireland-census-preview.cantabular.com/graphql"
@@ -73,7 +73,7 @@ def create_overpass_query(county):
   [out:json][timeout:30];
   area["admin_level"="6"]["name"="{county}"];
   (
-    relation(area)["admin_level"="9"];
+    relation(area)["admin_level"="9"]["date"="1911"];
   );
   (._;>;);
   out body;
