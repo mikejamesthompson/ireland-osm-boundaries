@@ -12,3 +12,7 @@ DEFAULT_GOAL := .venv
 requirements.txt: pyproject.toml
 	@echo "Compiling requirements.txt from pyproject.toml"
 	@pip-compile --generate-hashes --output-file requirements.txt pyproject.toml
+
+.PHONY: deds
+deds:
+	@source .venv/bin/activate && python scripts/get_ded_boundaries.py

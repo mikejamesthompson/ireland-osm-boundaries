@@ -6,7 +6,7 @@ import logging
 import geojson
 import requests
 
-from scripts.shared import get_osm_geojson, elevate_tags_to_properties
+from shared import get_osm_geojson, elevate_tags_to_properties
 
 
 GRAPHQL_ENDPOINT = "https://api.ireland-census-preview.cantabular.com/graphql"
@@ -73,7 +73,7 @@ def create_overpass_query(county):
   [out:json][timeout:30];
   area["admin_level"="6"]["name"="{county}"];
   (
-    relation(area)["admin_level"="9"]["date"="1911"];
+    relation(area)["admin_level"="9"];
   );
   (._;>;);
   out body;
@@ -126,8 +126,8 @@ def main():
     # Add a delay between requests to be kind and to limit
     # the number of times we have to back-off for a longer
     # period
-    LOGGER.info("Pausing for 20 seconds")
-    time.sleep(20)
+    LOGGER.info("Pausing for 15 seconds")
+    time.sleep(15)
   
   LOGGER.info("Writing output file")
   with open("./out/deds.geojson", mode="w") as f:

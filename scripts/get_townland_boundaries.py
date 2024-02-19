@@ -4,7 +4,7 @@ import logging
 import geojson
 from shapely.geometry import shape
 
-from scripts.shared import get_osm_geojson, elevate_tags_to_properties
+from shared import get_osm_geojson, elevate_tags_to_properties
 
 
 LOGGER = logging.getLogger(__name__)
