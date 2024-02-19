@@ -9,11 +9,11 @@ import requests
 from scripts.shared import get_osm_geojson, elevate_tags_to_properties
 
 
-GRAPHQL_ENDPOINT = "https://api-ext.ireland-census-preview.cantabular.com/graphql"
+GRAPHQL_ENDPOINT = "https://api.ireland-census-preview.cantabular.com/graphql"
 
 COUNTY_CATEGORIES_QUERY = """
 query VariableCategories {
-  dataset(name: "Ireland-1911-no-SDC") {
+  dataset(name: "Ireland-1911-preview") {
     variables(names: ["county_geoid"]) {
       edges {
         node {
